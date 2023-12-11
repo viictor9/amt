@@ -1,0 +1,33 @@
+Practical 10
+readinteger <- function() {
+  n <- as.integer(readline(prompt = "Enter value of k-1: "))
+  # Check if the file exists
+  file_path <- "C:/Users/ankus/OneDrive/Desktop/asidhsidbjsadujuabcjasbudasuvcvashs.txt"
+  if (!file.exists(file_path)) {
+    print("Error: File not found.")
+    return(NULL)
+  }
+  # Read the file using a connection
+  con <- file(file_path, open = "r")
+  lines <- character(0)
+  # Read lines and handle incomplete lines
+  while (length(line <- readLines(con, n = 1)) > 0) {
+    # Check for incomplete lines and skip them
+    if (length(line) > 0) {
+      lines <- c(lines, line)
+    }
+  }
+  close(con) # Close the file connection
+  if (length(lines) == 0) {
+    print("Error: The file is empty.")
+    return(NULL)
+  }
+  Shingle <- c()
+  for (i in 1:(length(lines) - n + 1)) {
+    Shingle <- append(Shingle, substr(lines, start = i, stop = i + n - 1))
+  }
+  print(Shingle)
+}
+
+# Call the function
+readinteger()

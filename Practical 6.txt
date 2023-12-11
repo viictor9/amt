@@ -1,0 +1,17 @@
+library(arules)
+library(arulesViz)
+library(RColorBrewer)
+data<-read.transactions('C:/Users/ankus/OneDrive/Documents/supermarket_sales - Sheet1.csv', rm.duplicates= TRUE, format="single",sep=",",header = TRUE,cols=c("City","Product line"))
+str(data)
+inspect(head(data))
+data@itemInfo$labels
+data_rules <- apriori(data, parameter = list(supp = 0.01, conf = 0.2))
+data_rules
+inspect(data_rules[1:20])
+inspect(head(sort(data_rules, by = "confidence"), 10))
+inspect(tail(sort(data_rules, by = "confidence"), 10))
+fashion_rules <- apriori(data=data, parameter=list (supp=0.001,conf =  0.08), appearance = list (rhs="Fashion accessories"))
+inspect(head(sort(fashion_rules, by = "confidence"), 10))
+fashion_rules_increased_support <- apriori(data, parameter = list(support =0.02, confidence = 0.5))
+inspect(head(sort(fashion_rules_increased_support, by = "confidence"), 10))
+itemFrequencyPlot(data,topN=20,type="absolute",col=brewer.pal(8,'Pastel2'), main="Absolute Item Frequency Plot")

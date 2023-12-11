@@ -1,0 +1,78 @@
+Practical No:- 04
+Aim:- Collaborative Nearest Neigbour
+Software Used: Google Collab
+Program Code:
+import numpy as np
+import pandas as pd
+from sklearn.neighbors import NearestNeighbors
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Disable FutureWarnings
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
+
+# Load the movie ratings data and the movie data from CSV files
+ratings = pd.read_csv('ratings.csv')
+movies = pd.read_csv('movies.csv')
+
+# Create a mapping from movie IDs to strings
+movie_mapper = {}
+movie_inv_mapper = {}
+for i in range(len(movies)):
+  movie_mapper[movies.loc[i, 'title']] = movies.loc[i, 'movieId']
+  movie_inv_mapper[movies.loc[i, 'movieId']] = movies.loc[i, 'title']
+
+# Create a matrix of movie vectors
+X = np.zeros((len(movies), 100))
+for i in range(len(movies)):
+  movie_id = movies.loc[i, 'movieId']
+  movie_ratings = ratings[ratings['movieId'] == movie_id]['rating']
+  X[i] = movie_ratings.mean()
+
+# Define a function to convert a movie ID to a string
+def movie_id_to_string(movie_id):
+  return movies.loc[movies['movieId'] == movie_id, 'title'].to_string()
+
+# Define a function to find similar movies using KNN
+def find_similar_movies(movie_id, X, k, metric='cosine', show_distance=False):
+  """Finds the k most similar movies to the given movie using KNN.
+
+  Args:
+    movie_id: The ID of the movie to find similar movies for.
+    X: The matrix of movie vectors.
+    k: The number of similar movies to find.
+    metric: The metric to use to measure similarity.
+    show_distance: Whether to show the distance between each movie and the given
+      movie.
+
+  Returns:
+    A list of the k most similar movie IDs.
+  """
+
+  neighbour_ids = []
+  movie_ind = movie_mapper[movie_id]
+  movie_vec = X[movie_ind]
+
+  KNN = NearestNeighbors(n_neighbors=k, algorithm="brute", metric=metric)
+  KNN.fit(X)
+
+  neighbour = KNN.kneighbors(movie_vec, return_distance=show_distance)
+
+  for i in range(0, k):
+    n = neighbour.item(i)
+    neighbour_ids.append(movie_inv_mapper[n])
+
+  return neighbour_ids
+
+# Example usage:
+
+# Get the movie ID for "The Shawshank Redemption"
+movie_id = movie_mapper["The Shawshank Redemption"]
+
+# Find the 5 most similar movies to "The Shawshank Redemption"
+similar_ids = find_similar_movies(movie_id, X, k=5)
+
+# Print the titles of the similar movies
+for i in similar_ids:
+  print(movie_titles[i])
